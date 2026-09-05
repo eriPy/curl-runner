@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "the program is running"
-
+basic="Content-Type: application/json"
 change=n
 api=""
 port=""
@@ -33,11 +33,23 @@ while true; do
     elif [ "$method" == "prob" ]; then
         continue
     fi
+    header="Content-Type: application/json"
+    read -p "wanna try with authentification? y/n: " wanna
+    if [ "$wanna" == "y" ]; then
+        read -p "Introduce token: " token
+        header="Authorization: Bearer $token"
+    fi
 
     if [ -z "$method" ]; then
-        curl="curl https://localhost:$port/$api/$endpoint"
-        echo "curl: $curl"
-        $curl
+        if [ "$wanna" == "y" ]; then
+            curl=(curl "http://localhost:$port/api/$api/$endpoint" -H "$header")
+            echo "${curl[@]}"
+            "${curl[@]}"
+        else
+            curl="curl http://localhost:$port/api/$api/$endpoint"
+            echo "curl: $curl"
+            $curl
+        fi
     else
         body="{"
         while true; do
@@ -50,8 +62,14 @@ while true; do
                 body="$body$key:$value,"
             fi
         done
-        curl_exe=(curl -X "$method" "http://localhost:$port/api/$api/$endpoint" -H "Content-Type: application/json" -d "$body")
-        echo "${curl_exe[@]}"
-        "${curl_exe[@]}"
+        if [ "$wanna" == "y" ]; then
+            curl_exe=(curl -X "$method" "http://localhost:$port/api/$api/$endpoint" -H "$header" -H "$basic" -d "$body")
+            echo "${curl_exe[@]}"
+            "${curl_exe[@]}"
+        else
+            curl_exe=(curl -X "$method" "http://localhost:$port/api/$api/$endpoint" -H "$header" -d "$body")
+            echo "${curl_exe[@]}"
+            "${curl_exe[@]}"
+        fi
     fi
 done
