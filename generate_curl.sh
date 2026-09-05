@@ -41,7 +41,7 @@ while true; do
     else
         body="{"
         while true; do
-            read -p "Introduce key value" key value
+            read -p "Introduce key value: " key value
             if [ -z "$key" ]; then
                 body="${body%,}"
                 body="$body}"
@@ -50,7 +50,8 @@ while true; do
                 body="$body$key:$value,"
             fi
         done
-        curl_exe=(curl -X "$method" "https://localhost:$port/$api/$endpoint" -H "Content-Type: application/json" -d "$body")
+        curl_exe=(curl -X "$method" "http://localhost:$port/api/$api/$endpoint" -H "Content-Type: application/json" -d "$body")
+        echo "${curl_exe[@]}"
         "${curl_exe[@]}"
     fi
 done
